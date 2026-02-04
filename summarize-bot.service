@@ -1,0 +1,26 @@
+#!/sbin/openrc-run
+
+name="summarizer-bot"
+description="Discord bot for message summarization"
+command="/home/spencer/.local/bin/uv"
+command_args="run --directory /home/spencer/summarizer-bot python3 -m summarize_bot"
+
+# Working directory
+directory="/home/spencer/summarizer-bot"
+
+# Environment file
+required_files="/home/spencer/summarizer-bot/.env"
+
+# Dependencies - requires networking
+depend() {
+	need net
+	after firewall
+}
+
+# Source environment variables
+start_pre() {
+	checkpath -d -o spencer -g spencer "$directory"
+	ebegin "Sourcing environment variables"
+	source "$required_files"
+	eend $?
+}
