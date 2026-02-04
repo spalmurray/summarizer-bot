@@ -1,0 +1,20 @@
+[project]
+name = "summarize-bot"
+version = "0.1.0"
+description = "Discord bot that uses LLM to summarize missed messages"
+requires-python = ">=3.10"
+dependencies = [
+    "discord.py>=2.4.0",
+    "requests>=2.32.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+summarize-bot = "summarize_bot.bot:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = []
