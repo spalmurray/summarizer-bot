@@ -6,8 +6,8 @@ import discord.utils
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from src.summarize_bot.ollama_client import OllamaClient
-from src.summarize_bot.commands import setup_commands
+from summarize_bot.ollama_client import OllamaClient
+from summarize_bot.commands import setup_commands
 import logging
 
 # Load environment variables

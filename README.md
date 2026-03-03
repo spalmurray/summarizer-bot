@@ -99,7 +99,7 @@ The bot will automatically parse these and fetch messages from the current chann
 uv run python -m summarize_bot
 
 # Or using direct Python
-python -m src.summarize_bot
+python -m summarize_bot
 ```
 
 ## Project Structure

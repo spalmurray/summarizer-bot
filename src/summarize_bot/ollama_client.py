@@ -5,8 +5,8 @@ import requests
 import asyncio
 import json
 from typing import List, Dict, Any, Optional
-from src.summarize_bot.discord_tool import get_messages
-from src.summarize_bot.prompt import ANALYSIS_PROMPT
+from summarize_bot.discord_tool import get_messages
+from summarize_bot.prompt import ANALYSIS_PROMPT
 import logging
 
 logger = logging.getLogger(__name__)

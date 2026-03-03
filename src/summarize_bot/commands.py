@@ -4,8 +4,8 @@ import discord
 from discord import app_commands
 import logging
 from datetime import datetime, timedelta
-from src.summarize_bot.ollama_client import OllamaClient
-from src.summarize_bot.discord_tool import get_messages
+from summarize_bot.ollama_client import OllamaClient
+from summarize_bot.discord_tool import get_messages
 
 logger = logging.getLogger(__name__)
 
@@ -100,3 +100,52 @@ def setup_commands(tree: app_commands.CommandTree, ollama_client: OllamaClient):
         except Exception as e:
             logger.error(f"Error generating summary: {str(e)}")
             await interaction.followup.send(f"❌ Failed to generate summary: {str(e)}")
+
+    @tree.command(name="llm", description="Chat with the attached LLM")
+    async def llm_chat(interaction: discord.Interaction, prompt: str):
+        """Chat with the attached LLM directly.
+
+        Args:
+            interaction: Discord interaction
+            prompt: The user's message to send to the LLM
+        """
+        # Only respond to users, not bots
+        if interaction.user.bot:
+            return
+
+        try:
+            # Defer interaction response (for potentially long operations)
+            await interaction.response.defer(ephemeral=False)
+
+            # Generate response using LLM
+            response = interaction.client.ollama_client._ollama_request_analyze([{"role": "user", "content": prompt}])
+
+            if "error" in response:
+                await interaction.followup.send(f"❌ Ollama API error: {response['error']}")
+                return
+
+            content = response.get("message", {}).get("content", "")
+
+            if not content:
+                await interaction.followup.send("❌ No response from LLM")
+                return
+
+            # Send the response in chunks if needed
+            prefix = f"{interaction.user.mention} asked \"{prompt}\"\n\n"
+            max_length = 2000 - len(prefix)
+
+            if len(content) > max_length:
+                # Split content into chunks of max_length
+                chunks = [content[i:i + max_length] for i in range(0, len(content), max_length)]
+                logger.info(f"Split response into {len(chunks)} chunks")
+
+                # Send all chunks
+                for i, chunk in enumerate(chunks):
+                    await interaction.followup.send(f"{prefix}{chunk}")
+                    prefix = ""  # Don't repeat user info in subsequent chunks
+            else:
+                await interaction.followup.send(f"{prefix}{content}")
+
+        except Exception as e:
+            logger.error(f"Error in LLM chat: {str(e)}")
+            await interaction.followup.send(f"❌ Failed to chat with LLM: {str(e)}")
